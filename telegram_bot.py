@@ -7,6 +7,7 @@ from telegram.ext import (
     MessageHandler,
     filters,
 )
+from DB_handler import insert_comment
 from pinecone_query import make_anime_query
 from pinecone import Pinecone
 from json_data import make_anime_response
@@ -20,7 +21,7 @@ telegram_key = os.getenv('TELEGRAM_API_KEY')
 
 PC = Pinecone(api_key=pinecone_key)
 
-START, DESCRIPTION, WAIT_FOR_COMMAND = range(3)
+START, DESCRIPTION, WAIT_FOR_COMMAND, WAIT_FOR_COMMENT = range(4)
 
 async def get_anime_4(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle the /getanime4 command"""
@@ -46,6 +47,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     commands = """
         Here are all available commands:
         /help - Show this help message
+        /leave_comment - leave a comment to improve the service
         /getanime4 - Get 4 anime recommendations based on your description
         /getanime2 - Get 2 anime recommendations based on your description
         /start - show start message of bot
@@ -53,6 +55,23 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(commands)
 
     return START
+
+async def handle_comment(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    comment = update.message.text
+    user = update.message.from_user 
+    username = user.username
+    first_name = user.first_name
+    try :
+        insert_comment([username, first_name, comment])
+    except:
+        pass
+    await update.message.reply_text(f"""
+    We are saving this comment ( {comment} ) on the DB \n
+    Thank you, we'll improve thanks to YOU :D \n
+    command /help or /start to see available commands \n
+    """)
+
+    return ConversationHandler.END
 
 async def handle_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle the user's description input"""
@@ -97,6 +116,14 @@ async def handle_other(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Here are more recommendations. Use /other for more, /help for commands, or /end to finish.")
     return WAIT_FOR_COMMAND
 
+async def leave_comment(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("""
+    Now you can leave a comment\n
+    write what you think about this BOT\n
+    we'll try to improve based on your opinion !! :D
+    """)
+    return WAIT_FOR_COMMENT
+
 async def end(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     context.user_data.clear()  
@@ -107,6 +134,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handles the /help command."""
     await update.message.reply_text(
         "Available commands:\n"
+        "/leave_comment - leave a comment to improve the service\n"
         "/start - Start the recommendation process.\n"
         "/help - Display this help message.\n"  # 
         "/getanime4 - Get 4 anime recommendations based on your description\n"
@@ -123,6 +151,7 @@ def main() -> None:
     conv_handler = ConversationHandler(
         entry_points=[
                 CommandHandler("start", start), 
+                CommandHandler("leave_comment", leave_comment), 
                 CommandHandler("help", help_command),
                 CommandHandler('getanime4', get_anime_4),
                 CommandHandler('getanime2', get_anime_2),
@@ -131,8 +160,12 @@ def main() -> None:
             START: [
                 CommandHandler('getanime4', get_anime_4),
                 CommandHandler('getanime2', get_anime_2),
+                CommandHandler("leave_comment", leave_comment), 
                 CommandHandler("end", end),
                 CommandHandler("help", help_command),
+            ],            
+            WAIT_FOR_COMMENT: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, handle_comment),
             ],
             DESCRIPTION: [
                 MessageHandler(filters.TEXT & ~filters.COMMAND, handle_description),
