@@ -78,7 +78,7 @@ async def handle_description(update: Update, context: ContextTypes.DEFAULT_TYPE)
     description = update.message.text
     mode = context.user_data.get('mode')  
     num_recommendations = 2 if mode == '2' else 4
-    
+    print(update.message.from_user.username, 'sta dando una descrizione . . .', description)
     # Here you would typically process the description and generate recommendations
     # This is a placeholder response - replace with your actual recommendation logic
     await update.message.reply_text(f"Processing your request for {num_recommendations} anime based on: '{description}'")
