@@ -1,6 +1,6 @@
-from utils.mistral_api import get_embeddings
-import os
-from pinecone import Pinecone, ServerlessSpec
+from mistral_api import get_embeddings
+from pinecone.grpc import PineconeGRPC as Pinecone
+from pinecone import ServerlessSpec
 from utils.test import load_json_anime
 
 def split_into_chunks(lst, n):
@@ -8,10 +8,10 @@ def split_into_chunks(lst, n):
         yield lst[i:i + n]
 
 # Initialize Pinecone client
-pc = Pinecone(api_key='pcsk_2PdNQU_LF4psBHRnLPHMCcda8uoUTZejRHxVQVPuykXVR46MMVZvmbiD3Gh7bm6rusovHW')
+pc = Pinecone(api_key='')
 
 # Create or connect to an index
-index_name = "anime-cleaned"
+index_name = "serieTV-cleaned"
 if index_name not in pc.list_indexes().names():
     pc.create_index(
         name=index_name,
@@ -31,8 +31,8 @@ global_counter = 0
 
 anime_json = load_json_anime()
 anime_to_embed = [anime['description'] + anime['genre'] for anime in anime_json]
-chunks_embedded = split_into_chunks(anime_to_embed, 100)
-chunks_anime = split_into_chunks(anime_json, 100)
+chunks_embedded = split_into_chunks(anime_to_embed, 80)
+chunks_anime = split_into_chunks(anime_json, 80)
 
 for chunk_a, chunk_e in zip(chunks_anime, chunks_embedded):
 
