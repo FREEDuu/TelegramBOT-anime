@@ -1,42 +1,48 @@
 import json
-from utils.get_anime import get_anime
-from utils.test import load_json_anime
-def ciao():
-    # File name
-    file_name = "data_new.json"
 
-    # Step 1: Read the existing JSON data
-    try:
-        with open(file_name, "r") as json_file:
-            existing_data = json.load(json_file)  # Load existing data
-    except FileNotFoundError:
-        # If the file doesn't exist, start with an empty list or dictionary
-        existing_data = []
+def load_json(filename):
+    # Step 1: Open the JSON file
+    with open(filename, 'r') as file:
+        # Step 2: Load the JSON data
+        data = json.load(file)
 
-    new_data = get_anime()
-    # Step 2: Modify the data
-    # If the existing data is a list, append the new object
-    if isinstance(existing_data, list):
-        existing_data.append(new_data)
-    # If the existing data is a dictionary, merge the new object
-    elif isinstance(existing_data, dict):
-        existing_data.update(new_data)
-    else:
-        raise ValueError("Existing JSON data is not a list or dictionary.")
+    # Now `data` is a Python dictionary (or list, depending on the JSON structure)
+    return (data)
 
-    # Step 3: Write the updated data back to the file
-    with open(file_name, "w") as json_file:
-        json.dump(existing_data, json_file, indent=4)
-
-    print(f"New data has been inserted into {file_name}")
+def load_json_anime():
+    # Step 1: Open the JSON file
+    with open('anime.json', 'r') as file:
+        # Step 2: Load the JSON data
+        data = json.load(file)
+    return data[0]
 
 def make_anime_response(metadata_anime):
     name = metadata_anime['metadata']['anime']
     anime_json = load_json_anime()
     result = next((item for item in anime_json if item["name"] == name), None)
-    caption = f""" Titolo anime : {result['name']}
-                \nDescrizione : {result['description']} 
-                \nGeneri : {result['genre']} 
-                \nDove vederlo : {result['anime_link']}
+    caption = f"""✨ Titolo Anime: {result['name']}  
+    📝 Descrizione: {result['description']}  
+    🎭 Generi: {result['genre']}  
+    📺 Dove vederlo: {result['anime_link']}  
     """
+
     return result['image_link'], caption
+
+def make_tvfilm_response(metadata_film, filename):
+    title = metadata_film['metadata']['title']
+    anime_json = load_json(filename)
+    result = next((item for item in anime_json if item["title"] == title), None)
+    specs = result['specs'].split('-')[:2]
+    caption = f"""🎬 Titolo: {result['title']}  
+    📅 Anno: {specs[0]} | ⏳ Durata: {specs[1]}  
+    📝 Descrizione: {result['description']}  
+    🎭 Generi: {result['genre']}  
+    📺 Dove vederlo: {result['url']}  
+    """
+
+    return result['currentSrc'], caption
+
+def make_film_response(metadata_film, filename):
+    return make_tvfilm_response(metadata_film, filename)
+def make_tv_response(metadata_film, filename):
+    return make_tvfilm_response(metadata_film, filename)

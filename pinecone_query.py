@@ -1,15 +1,14 @@
 from pinecone import Pinecone, ServerlessSpec
-import os
-from utils.mistral_api import get_embeddings
+from mistral_api import get_embeddings
 
-def make_anime_query(pc,description):
+def make_query(pc,description, type):
     anime_embeddings = get_embeddings(
         [
             description
         ]
     )[0]
     # Create or connect to an index
-    index_name = "anime-cleaned"
+    index_name = type #anime_cleaned
     index = pc.Index(index_name)
 
 
@@ -22,3 +21,4 @@ def make_anime_query(pc,description):
 
     # Display results with titles
     return results['matches']        
+   

@@ -39,6 +39,8 @@ def load_json_anime():
     # Now `data` is a Python dictionary (or list, depending on the JSON structure)
     return (data[0])
 
+
+
 def clean_json():
     anime_json = load_json_anime()
     cleaned = clean_anime_list(anime_json)

@@ -12,3 +12,6 @@ You can find an article on my blog describe how this bot works :
 https://emotionaldata.netlify.app/posts/how-my-telegram-bot-works/
 
 fell free to contact me , pull request or get and change the code :D
+
+## Now the bot can reccomend TV-series / anime and films
+
