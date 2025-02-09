@@ -15,3 +15,4 @@ fell free to contact me , pull request or get and change the code :D
 
 ## Now the bot can reccomend TV-series / anime and films
 
+![Screenshot from 2025-02-09 10-30-54](https://github.com/user-attachments/assets/0a80f4fc-b243-4542-affb-0d6969168c5b)
