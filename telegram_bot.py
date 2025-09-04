@@ -7,7 +7,7 @@ from telegram.ext import (
     MessageHandler,
     filters,
 )
-from DB_handler import insert_comment, insert_prompt
+#from DB_handler import insert_comment, insert_prompt
 from pinecone_query import make_query
 from pinecone import Pinecone
 from json_data import make_anime_response, make_film_response, make_tv_response
@@ -59,10 +59,12 @@ async def handle_comment(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user 
     username = user.username
     first_name = user.first_name
-    try :
-        insert_comment([username, first_name, comment])
-    except:
-        pass
+    """    
+        try :
+            insert_comment([username, first_name, comment])
+        except:
+            pass
+    """
     await update.message.reply_text(f"""
     We are saving this comment ( {comment} ) on the DB \n
     Thank you, we'll improve thanks to YOU :D \n
@@ -79,11 +81,11 @@ async def handle_description(update: Update, context: ContextTypes.DEFAULT_TYPE)
     user = update.message.from_user 
     username = user.username
     first_name = user.first_name
-    try :
+    """    try :
         insert_prompt([username, first_name, description])
     except:
-        pass    # Here you would typically process the description and generate recommendations
-    # This is a placeholder response - replace with your actual recommendation logic
+        pass
+    """
     await update.message.reply_text(f"Processing your request for {num_recommendations} based on: '{description}'")
     
     # Simulated processing delay
